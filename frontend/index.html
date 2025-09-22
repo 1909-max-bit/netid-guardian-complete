@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NetID Guardian Dashboard</title>
+  <style>
+    body { background:#071126; color:#E6F0FF; font-family: Arial, sans-serif; margin:0; padding:20px; }
+    header { display:flex; align-items:center; gap:20px; }
+    .logo { width:64px; height:64px; background:#0b3b6f; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); padding:16px; border-radius:8px; margin-bottom:12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);}
+    table { width:100%; border-collapse:collapse; color:#e6f0ff; }
+    th,td { padding:8px; border-bottom:1px solid rgba(255,255,255,0.03); text-align:left; }
+    .btn { background:#0ea5ff; color:#012; padding:8px 12px; border-radius:6px; text-decoration:none; color:black; font-weight:600;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">NG</div>
+    <div>
+      <h1>NetID Guardian</h1>
+      <div>لوحة تحكم بسيطة - عرض تجريبي</div>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>الأحداث الأخيرة</h2>
+    <table id="events-table">
+      <thead><tr><th>ID</th><th>Type</th><th>Time</th><th>Data</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p><a href="#" id="refresh" class="btn">تحديث</a></p>
+  </section>
+
+  <script>
+    async function fetchEvents(){
+      try{
+        const res = await fetch('http://localhost:8000/api/events');
+        const data = await res.json();
+        const tbody = document.querySelector('#events-table tbody');
+        tbody.innerHTML = '';
+        for(const e of data){
+          const tr = document.createElement('tr');
+          const d = new Date(e.timestamp*1000);
+          tr.innerHTML = `<td>${e.id}</td><td>${e.type}</td><td>${d.toLocaleString()}</td><td><pre style="white-space:pre-wrap;max-height:100px;overflow:auto">${e.data}</pre></td>`;
+          tbody.appendChild(tr);
+        }
+      }catch(err){
+        console.error(err);
+        const tbody = document.querySelector('#events-table tbody');
+        tbody.innerHTML = '<tr><td colspan="4">فشل في الاتصال بالـ backend. تأكد أنه يعمل.</td></tr>';
+      }
+    }
+    document.getElementById('refresh').addEventListener('click', (ev)=>{ ev.preventDefault(); fetchEvents(); });
+    fetchEvents();
+  </script>
+</body>
+</html>

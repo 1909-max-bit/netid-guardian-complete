@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=development
+  agent:
+    build: ./agent
+    volumes:
+      - ./agent:/app
+    network_mode: "host"
+  frontend:
+    image: nginx:alpine
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    ports:
+      - "3000:80"
